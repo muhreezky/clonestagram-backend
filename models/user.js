@@ -57,6 +57,10 @@ module.exports = (sequelize, Sequelize) => {
     verify_token: {
       type: Sequelize.STRING,
     },
+    verified: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
+    },
     reset_token: {
       type: Sequelize.STRING,
     },
