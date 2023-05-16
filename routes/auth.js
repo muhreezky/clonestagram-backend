@@ -22,11 +22,12 @@ routes.post("/verify/:verify_token", authMiddleware.fromToken, authController.ve
 
 routes.post("/forgot", body("email").isEmail(), authController.sendResetLink);
 
-routes.post("/pass", authMiddleware.fromToken, authController.resetPass);
+routes.put("/pass/:reset_token", authController.resetPass);
 routes.put("/pass", body("password"), body("new_pass"), authMiddleware.fromToken, authController.changePass);
 
 routes.post("/requestverify", authMiddleware.fromToken, authController.sendVerification);
 
 routes.get("/user", authMiddleware.fromToken, authController.checkUser);
+routes.get("/user/:user_id", authController.getById);
 routes.put("/user", authMiddleware.fromToken, upload.single("picture"), authController.editProfile);
 module.exports = routes;

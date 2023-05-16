@@ -224,7 +224,7 @@ const authController = {
 
       const content = await fs.readFileSync('./forgot.html', 'utf-8');
       const compiled = handlebars.compile(content);
-      const resetLink = `${process.env.FRONTEND}/forgot/${user.reset_token}`;
+      const resetLink = `${process.env.FRONTEND}/reset/${user.reset_token}`;
       const html = compiled({ email, resetLink });
 
       await transporter.sendMail({
@@ -314,7 +314,7 @@ const authController = {
       const { username, fullname, bio } = req.body;
 
       const path = req.file?.path;
-      console.log(req.file);
+      // console.log(req.file);
       const cleanPath = path && path.replace(/\\/g, "/").replace("public/", "")
       const imgUrl = path ? `${req.protocol}://${req.headers.host}/${cleanPath}` : "";
 
@@ -323,11 +323,13 @@ const authController = {
           user_id
         }
       });
-
+      
       /**@type {string} */
       const deletePath = user.profile_pic.replace(`${req.protocol}://${req.headers.host}/`, "");
-      if (deletePath.indexOf("default-avatar.png") === -1) {
-        await fs.unlinkSync(`${__dirname}/../public/${deletePath}`);
+      const target = `${__dirname}/../public/${deletePath}`;
+
+      if (path && deletePath.indexOf("default-avatar.png") === -1 && fs.existsSync(target)) {
+        fs.unlinkSync(target);
       }
 
       if (username && (username !== user.username)) {
@@ -338,7 +340,7 @@ const authController = {
       user.fullname = fullname || user.fullname;
       await user.save();
       
-      console.log(user);
+      // console.log(user);
 
       return res.status(200).json({
         user,
@@ -346,8 +348,31 @@ const authController = {
       })
     } 
     catch (err) {
-      console.log(JSON.stringify(err));
-      return res.status(500).json({ message: err });  
+      // console.log(JSON.parse(JSON.stringify(err)));
+      return res.status(500).json({ message: err.message });  
+    }
+  },
+
+  /**
+   * 
+   * @param {import("express").Request} req 
+   * @param {import("express").Response} res 
+   */
+  getById: async (req, res) => {
+    try {
+      const { user_id } = req.params;
+      
+      const user = await User.findOne({
+        where: {
+          user_id
+        }
+      });
+
+      console.log(user);
+      return res.status(200).json(user);
+    } 
+    catch (error) {
+      return res.status(500).json(error);
     }
   }
 };

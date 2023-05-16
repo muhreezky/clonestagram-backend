@@ -21,8 +21,18 @@ module.exports = (sequelize, Sequelize) => {
     }
   }
   Post.init({
+    post_id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER
+    },
     user_id: {
       type: Sequelize.INTEGER,
+      allowNull: false
+    },
+    username: {
+      type: Sequelize.STRING,
       allowNull: false
     },
     caption: {
