@@ -10,7 +10,8 @@ routes.put("/:post_id", authMiddleware.fromToken, postController.editPost);
 routes.get("/:post_id", authMiddleware.fromToken, postController.viewPost);
 routes.delete("/:post_id", authMiddleware.fromToken, postController.deletePost);
 
-routes.post("/:post_id/likes", authMiddleware.fromToken, postController.likeDislike);
-routes.get("/:post_id/likes", authMiddleware.fromToken, postController.commentList);
+routes.put("/:post_id/likes", authMiddleware.fromToken, postController.likeDislike);
+routes.get("/:post_id/comments", authMiddleware.fromToken, postController.commentList);
+routes.post("/:post_id/comments", authMiddleware.fromToken, postController.sendComment);
 
 module.exports = routes;

@@ -1,4 +1,4 @@
-const { User, Post, Like } = require("../models");
+const { User, Post, Like, Comments } = require("../models");
 
 const postController = {
   /**
@@ -129,24 +129,34 @@ const postController = {
       const { user_id } = req.user;
       const { post_id } = req.params;
 
-      const like = await Like.findOne({
+      // const like = await Like.findOne({
+      //   where: {
+      //     user_id,
+      //     post_id
+      //   }
+      // });
+
+      // if (!like) {
+      //   await Like.create({
+      //     user_id,
+      //     post_id
+      //   });
+      //   return res.status(200).json({ message: "Liked a post" });
+      // } 
+      // else {
+      //   like.liked = !like.liked;
+      //   return res.status(200).json({ message: `${like.liked ? "Liked" : "Un-liked"} a post` });
+      // }
+      const post = await Post.findOne({
         where: {
-          user_id,
           post_id
         }
       });
 
-      if (!like) {
-        await Like.create({
-          user_id,
-          post_id
-        });
-        return res.status(200).json({ message: "Liked a post" });
-      } 
-      else {
-        like.liked = !like.liked;
-        return res.status(200).json({ message: `${like.liked ? "Liked" : "Un-liked"} a post` });
-      }
+      post.likes = (post.likes + 1);
+      await post.save();
+
+      return res.status(200).json({ message: "Liked" });
     } 
     catch (error) {
       return res.status(500).json({ message: error.message });
@@ -162,16 +172,38 @@ const postController = {
     try {
       const { post_id } = req.params;
       
-      const comment = await Comment.findAndCountAll({
+      const comment = await Comments.findAndCountAll({
         where: {
           post_id
-        }
+        },
+        order: [["createdAt", "DESC"]],
+        limit: 5
       });
 
+      console.log(comment);
       return res.status(200).json(comment);
     } 
     catch (error) {
       return res.status(500).json(error);
+    }
+  },
+
+  sendComment: async (req, res) => {
+    try {
+      const { user_id } = req.user;
+      const { post_id } = req.params;
+      const { comment_text } = req.body;
+      
+      const comment = await Comments.create({
+        user_id,
+        post_id,
+        comment_text
+      });
+
+      return res.status(201).json(comment);
+    } 
+    catch (error) {
+      return res.status(500).json({ message: error.message });
     }
   }
 }
