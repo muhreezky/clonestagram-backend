@@ -294,7 +294,7 @@ const authController = {
       const hashed = await bcrypt.hash(password, salt);
 
       user.password = hashed;
-      user.save();
+      await user.save();
 
       return res.status(200).json({ message: "Password Saved" });
     }
@@ -314,35 +314,40 @@ const authController = {
       const { username, fullname, bio } = req.body;
 
       const path = req.file?.path;
+      console.log(req.file);
       const cleanPath = path && path.replace(/\\/g, "/").replace("public/", "")
-      const imgUrl = path && `${req.protocol}://${req.headers.host}/${cleanPath}`;
+      const imgUrl = path ? `${req.protocol}://${req.headers.host}/${cleanPath}` : "";
 
       const user = await User.findOne({
-        user_id
+        where: {
+          user_id
+        }
       });
 
+      /**@type {string} */
       const deletePath = user.profile_pic.replace(`${req.protocol}://${req.headers.host}/`, "");
-      if (path) {
+      if (deletePath.indexOf("default-avatar.png") === -1) {
         await fs.unlinkSync(`${__dirname}/../public/${deletePath}`);
       }
 
-      if (username !== user.username) {
+      if (username && (username !== user.username)) {
         user.username = username;
       }
       user.bio =  bio || user.bio;
-      user.picture = path ? imgUrl : user.profile_pic;
+      user.profile_pic = path ? imgUrl : user.profile_pic;
       user.fullname = fullname || user.fullname;
-
       await user.save();
+      
       console.log(user);
 
       return res.status(200).json({
+        user,
         message: "Data Edited Successfully"
       })
     } 
-    catch (error) {
-      console.log(error);
-      return res.status(500).json({ message: error.message });  
+    catch (err) {
+      console.log(JSON.stringify(err));
+      return res.status(500).json({ message: err });  
     }
   }
 };

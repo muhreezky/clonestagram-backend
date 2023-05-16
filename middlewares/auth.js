@@ -10,7 +10,7 @@ const authMiddleware = {
   fromToken: async (req, res, next) => {
     try {
       const { authorization } = req.headers;
-      const access_token = authorization?.split(" ")[1];
+      const access_token = authorization.split(" ")[1];
       const account = await jwt.verify(access_token, process.env.JWT_SECRET);
   
       if (!account) return res.status(401).json({ message: "Unauthorized" });

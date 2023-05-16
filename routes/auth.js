@@ -20,7 +20,7 @@ routes.post(
 
 routes.post("/verify/:verify_token", authMiddleware.fromToken, authController.verifyEmail);
 
-routes.post("/forgot", body("email").isEmail(), authMiddleware.fromToken, authController.sendResetLink);
+routes.post("/forgot", body("email").isEmail(), authController.sendResetLink);
 
 routes.post("/pass", authMiddleware.fromToken, authController.resetPass);
 routes.put("/pass", body("password"), body("new_pass"), authMiddleware.fromToken, authController.changePass);
@@ -29,5 +29,4 @@ routes.post("/requestverify", authMiddleware.fromToken, authController.sendVerif
 
 routes.get("/user", authMiddleware.fromToken, authController.checkUser);
 routes.put("/user", authMiddleware.fromToken, upload.single("picture"), authController.editProfile);
-
 module.exports = routes;

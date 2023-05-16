@@ -2,8 +2,8 @@ const multer = require("multer");
 const base = "public/images"
 
 const storage = multer.diskStorage({
-  destination: function (req, res, cb) {
-    switch (req.file?.fieldname) {
+  destination: function (req, file, cb) {
+    switch (file.fieldname) {
       case "picture":
         cb(null, `${base}/avatars`);
         break;
@@ -13,8 +13,8 @@ const storage = multer.diskStorage({
     }
   },
   filename: function (req, file, cb) {
-    const name = file.fieldname === "picture" ? "avatar-" : "post-";
-    cb(null, `${name}${Date.now()}.${file.mimetype.split("/")[1]}`);
+    const name = file.fieldname === "picture" ? "avatar" : "post";
+    cb(null, `${name}-${Date.now()}.${file.mimetype.split("/")[1]}`);
   }
 });
 
@@ -23,7 +23,7 @@ const fileFilter = (req, file, cb) => {
     cb (null, true);
   }
   else {
-    cb (new Error("File incompatible"));
+    cb (new Error("File incompatible"), false);
   }
 }
 
